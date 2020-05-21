@@ -4,6 +4,7 @@ const fs = require('fs')
 const path = require('path')
 const Jimp = require('jimp')
 const pngToIco = require('png-to-ico')
+const potrace = require('potrace')
 
 const argv = require('yargs')
   .usage('Usage: $0 -o FOLDER -i ICON_PATH -n APP_NAME')
@@ -111,72 +112,64 @@ const iconsConfig = [
     size: 57,
     type: 'image/png',
     head: 'apple-touch-icon',
-    backgroundColor: true,
-    browserconfig: false,
-    manifest: false
+    backgroundColor: true
   },
   {
     file: '/icons/apple-icon-72×72.png',
     size: 72,
     type: 'image/png',
     head: 'apple-touch-icon',
-    backgroundColor: true,
-    browserconfig: false,
-    manifest: false
+    backgroundColor: true
   },
   {
     file: '/icons/apple-icon-76×76.png',
     size: 76,
     type: 'image/png',
     head: 'apple-touch-icon',
-    backgroundColor: true,
-    browserconfig: false,
-    manifest: false
+    backgroundColor: true
   },
   {
     file: '/icons/apple-icon-114×114.png',
     size: 114,
     type: 'image/png',
     head: 'apple-touch-icon',
-    backgroundColor: true,
-    browserconfig: false,
-    manifest: false
+    backgroundColor: true
   },
   {
     file: '/icons/apple-icon-120×120.png',
     size: 120,
     type: 'image/png',
     head: 'apple-touch-icon',
-    backgroundColor: true,
-    browserconfig: false,
-    manifest: false
+    backgroundColor: true
   },
   {
     file: '/icons/apple-icon-144×144.png',
     size: 144,
     type: 'image/png',
     head: 'apple-touch-icon',
-    backgroundColor: true,
-    browserconfig: false,
-    manifest: false
+    backgroundColor: true
   },
   {
     file: '/icons/apple-icon-152×152.png',
     size: 152,
     type: 'image/png',
     head: 'apple-touch-icon',
-    backgroundColor: true,
-    browserconfig: false,
-    manifest: false
+    backgroundColor: true
   },
   {
     file: '/icons/apple-icon-180×180.png',
     size: 180,
     type: 'image/png',
     head: 'apple-touch-icon',
-    backgroundColor: true,
-    browserconfig: false,
-    manifest: false
+    backgroundColor: true
+  },
+  // Android
+  {
+    file: '/icons/android-icon-192×192.png',
+    size: 192,
+    type: 'image/png',
+    head: 'icon',
+    backgroundColor: true
   },
   // PWA
   {
@@ -184,7 +177,6 @@ const iconsConfig = [
     size: 36,
     type: 'image/png',
     backgroundColor: true,
-    browserconfig: false,
     manifest: true
   },
   {
@@ -192,7 +184,6 @@ const iconsConfig = [
     size: 48,
     type: 'image/png',
     backgroundColor: true,
-    browserconfig: false,
     manifest: true
   },
   {
@@ -200,7 +191,6 @@ const iconsConfig = [
     size: 72,
     type: 'image/png',
     backgroundColor: true,
-    browserconfig: false,
     manifest: true
   },
   {
@@ -208,7 +198,6 @@ const iconsConfig = [
     size: 96,
     type: 'image/png',
     backgroundColor: true,
-    browserconfig: false,
     manifest: true
   },
   {
@@ -216,7 +205,6 @@ const iconsConfig = [
     size: 128,
     type: 'image/png',
     backgroundColor: true,
-    browserconfig: false,
     manifest: true
   },
   {
@@ -224,7 +212,6 @@ const iconsConfig = [
     size: 144,
     type: 'image/png',
     backgroundColor: true,
-    browserconfig: false,
     manifest: true
   },
   {
@@ -232,7 +219,6 @@ const iconsConfig = [
     size: 152,
     type: 'image/png',
     backgroundColor: true,
-    browserconfig: false,
     manifest: true
   },
   {
@@ -240,7 +226,6 @@ const iconsConfig = [
     size: 192,
     type: 'image/png',
     backgroundColor: true,
-    browserconfig: false,
     manifest: true
   },
   {
@@ -248,7 +233,6 @@ const iconsConfig = [
     size: 384,
     type: 'image/png',
     backgroundColor: true,
-    browserconfig: false,
     manifest: true
   },
   {
@@ -256,7 +240,6 @@ const iconsConfig = [
     size: 512,
     type: 'image/png',
     backgroundColor: true,
-    browserconfig: false,
     manifest: true
   },
   // Microsoft
@@ -265,74 +248,46 @@ const iconsConfig = [
     size: 70,
     type: 'image/png',
     backgroundColor: true,
-    browserconfig: true,
-    manifest: false
+    browserconfig: true
   },
   {
     file: '/icons/ms-icon-150x150.png',
     size: 150,
     type: 'image/png',
-    head: 'tile-image',
     backgroundColor: true,
-    browserconfig: true,
-    manifest: false
+    browserconfig: true
   },
   {
     file: '/icons/ms-icon-310x310.png',
     size: 310,
     type: 'image/png',
     backgroundColor: true,
-    browserconfig: true,
-    manifest: false
+    browserconfig: true
   },
   // Favicons
   {
     file: '/icons/favicon-16x16.png',
     size: 16,
     type: 'image/png',
-    head: 'icon',
-    browserconfig: false,
-    manifest: false
+    head: 'icon'
   },
   {
     file: '/icons/favicon-32x32.png',
     size: 32,
     type: 'image/png',
-    head: 'icon',
-    browserconfig: false,
-    manifest: false
+    head: 'icon'
   },
   {
     file: '/icons/favicon-48x48.png',
     size: 48,
     type: 'image/png',
-    head: 'icon',
-    browserconfig: false,
-    manifest: false
-  },
-  {
-    file: '/icons/favicon-128x128.png',
-    size: 128,
-    type: 'image/png',
-    head: 'icon',
-    browserconfig: false,
-    manifest: false
-  },
-  {
-    file: '/icons/favicon-192x192.png',
-    size: 128,
-    type: 'image/png',
-    head: 'icon',
-    browserconfig: false,
-    manifest: false
+    head: 'icon'
   },
   {
     file: '/icons/favicon-256x256.png',
     size: 256,
     type: 'image/png',
-    head: 'icon',
-    browserconfig: false,
-    manifest: false
+    head: 'icon'
   }
 ]
 
@@ -347,6 +302,14 @@ const generateFavicon = options => {
     })
 }
 
+const generateSvg = options => {
+  const outPath = path.join(options.o, '/icons/safari-pinned-tab-icon.svg')
+  potrace.trace(options.i, (err, svg) => {
+    if (err) throw err
+    fs.writeFileSync(outPath, svg)
+  })
+}
+
 const generateIcons = async options => {
   const image = await Jimp.read(options.i)
   if (image.bitmap.width < 512 || image.bitmap.height < 512) {
@@ -356,6 +319,7 @@ const generateIcons = async options => {
     throw new Error('Image is not square')
   }
   generateFavicon(options)
+  generateSvg(options)
   iconsConfig.forEach(icon => {
     const clonedImage = image.clone()
     const size = icon.size
@@ -438,14 +402,14 @@ const generateHeaderTags = (options, iconsConfig) => {
     `<meta name="apple-mobile-web-app-title" content="${options.n}" />`,
     '<meta name="format-detection" content="telephone=no" />',
     `<meta name="msapplication-TileColor" content="${options.themeColor}" />`,
+    `<meta name="msapplication-TileImage" content="/icons/ms-icon-150x150.png" />`,
     '<meta name="msapplication-config" content="/browserconfig.xml" />',
     '<meta name="msapplication-tap-highlight" content="no" />'
   ]
-  header = header.concat(iconsConfig.map(generateIconHeadTag))
-  header = header.concat(['<link rel="icon" href="/favicon.ico" />'])
-
+  header = header.concat(['<link rel="mask-icon" href="/icons/safari-pinned-tab-icon.svg">'])
+  header = header.concat(iconsConfig.filter(icon => icon.head).map(icon => `<link rel="${icon.head}" href="${icon.file}" type="${icon.type}" sizes="${icon.size}x${icon.size}" />`))
   header = header.concat(['<link rel="manifest" href="/manifest.json" />'])
-  return header.sort().join('\n')
+  return header.join('\n')
 }
 
 // START HERE
@@ -457,7 +421,7 @@ const main = async () => {
     console.log(err)
     process.exit(1)
   }
-  if (!argv.q) console.log('🖼  Icons generated')
+  if (!argv.q) console.log('🖼 Icons generated')
 
   generateManifest(
     argv,
