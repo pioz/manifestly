@@ -336,6 +336,17 @@ const iconsConfig = [
   }
 ]
 
+const generateFavicon = options => {
+  const outPath = path.join(options.o, 'favicon.ico')
+  pngToIco(options.i)
+    .then(buf => {
+      fs.writeFileSync(outPath, buf)
+    })
+    .catch(err => {
+      throw err
+    })
+}
+
 const generateIcons = async options => {
   const image = await Jimp.read(options.i)
   if (image.bitmap.width < 512 || image.bitmap.height < 512) {
@@ -344,11 +355,11 @@ const generateIcons = async options => {
   if (image.bitmap.width !== image.bitmap.height) {
     throw new Error('Image is not square')
   }
-  saveFavicon(options)
+  generateFavicon(options)
   iconsConfig.forEach(icon => {
     const clonedImage = image.clone()
     const size = icon.size
-    const outPath = path.join('.', options.o, icon.file)
+    const outPath = path.join(options.o, icon.file)
     clonedImage.resize(size, size)
     if (icon.backgroundColor && options.iconBackgroundColor) {
       new Jimp(size, size, options.iconBackgroundColor, (_err, bgImage) => {
@@ -360,22 +371,8 @@ const generateIcons = async options => {
   })
 }
 
-const saveFavicon = options => {
-  const outPath = path.join('.', options.o, 'favicon.ico')
-  pngToIco(options.i)
-    .then(buf => {
-      fs.writeFileSync(outPath, buf)
-    })
-    .catch(err => {
-      throw err
-    })
-}
-
 const generateManifest = (options, iconsConfig) => {
-  const manifest = {
-    name: options.n,
-    icons: []
-  }
+  const manifest = { name: options.n }
   if (options.backgroundColor) manifest.background_color = options.backgroundColor
   if (options.categories) manifest.categories = options.categories
   if (options.description) manifest.description = options.description
@@ -398,7 +395,7 @@ const generateManifest = (options, iconsConfig) => {
   })
 
   const json = JSON.stringify(manifest, null, 2)
-  const jsonPath = path.join('.', options.o, 'manifest.json')
+  const jsonPath = path.join(options.o, 'manifest.json')
   fs.writeFile(jsonPath, json, writeErrorCallback)
 }
 
@@ -415,7 +412,7 @@ const generateBrowserconfig = (options, icons) => {
     </tile>
   </msapplication>
 </browserconfig>`
-  const xmlPath = path.join('.', options.o, 'browserconfig.xml')
+  const xmlPath = path.join(options.o, 'browserconfig.xml')
   fs.writeFile(xmlPath, xml, writeErrorCallback)
 }
 
