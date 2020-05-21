@@ -115,49 +115,49 @@ const iconsConfig = [
     backgroundColor: true
   },
   {
-    file: '/icons/apple-icon-72×72.png',
+    file: '/icons/apple-icon-72x72.png',
     size: 72,
     type: 'image/png',
     head: 'apple-touch-icon',
     backgroundColor: true
   },
   {
-    file: '/icons/apple-icon-76×76.png',
+    file: '/icons/apple-icon-76x76.png',
     size: 76,
     type: 'image/png',
     head: 'apple-touch-icon',
     backgroundColor: true
   },
   {
-    file: '/icons/apple-icon-114×114.png',
+    file: '/icons/apple-icon-114x114.png',
     size: 114,
     type: 'image/png',
     head: 'apple-touch-icon',
     backgroundColor: true
   },
   {
-    file: '/icons/apple-icon-120×120.png',
+    file: '/icons/apple-icon-120x120.png',
     size: 120,
     type: 'image/png',
     head: 'apple-touch-icon',
     backgroundColor: true
   },
   {
-    file: '/icons/apple-icon-144×144.png',
+    file: '/icons/apple-icon-144x144.png',
     size: 144,
     type: 'image/png',
     head: 'apple-touch-icon',
     backgroundColor: true
   },
   {
-    file: '/icons/apple-icon-152×152.png',
+    file: '/icons/apple-icon-152x152.png',
     size: 152,
     type: 'image/png',
     head: 'apple-touch-icon',
     backgroundColor: true
   },
   {
-    file: '/icons/apple-icon-180×180.png',
+    file: '/icons/apple-icon-180x180.png',
     size: 180,
     type: 'image/png',
     head: 'apple-touch-icon',
@@ -165,7 +165,7 @@ const iconsConfig = [
   },
   // Android
   {
-    file: '/icons/android-icon-192×192.png',
+    file: '/icons/android-icon-192x192.png',
     size: 192,
     type: 'image/png',
     head: 'icon',
@@ -187,7 +187,7 @@ const iconsConfig = [
     manifest: true
   },
   {
-    file: '/icons/pwa-icon-72×72.png',
+    file: '/icons/pwa-icon-72x72.png',
     size: 72,
     type: 'image/png',
     backgroundColor: true,
