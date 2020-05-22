@@ -6,6 +6,7 @@ Simple cli tool to generate icons for your webapp for every device with PWA supp
 Manifestify do boring things for you:
 
 - 🖼 Cut and resize webapp icons
+- ⚙️ Optimize icons with [Pngcrush](https://pmt.sourceforge.io/pngcrush/)
 - 📋 Generete `manifest.json` file
 - 📋 Generete `browserconfig.xml` file
 - ✂️ Print tags to paste in the head tag of your web app

@@ -5,6 +5,7 @@ const path = require('path')
 const Jimp = require('jimp')
 const pngToIco = require('png-to-ico')
 const potrace = require('potrace')
+const { exec } = require('child_process')
 
 const argv = require('yargs')
   .usage('Usage: $0 -o FOLDER -i ICON_PATH -n APP_NAME')
@@ -263,26 +264,40 @@ const iconsConfig = [
   }
 ]
 
-const generateFavicon = options => {
-  const outPath = path.join(options.o, 'favicon.ico')
-  pngToIco(options.i)
-    .then(buf => {
-      fs.writeFileSync(outPath, buf)
-    })
-    .catch(err => {
-      throw err
-    })
-}
-
-const generateSvg = options => {
-  const outPath = path.join(options.o, '/icons/safari-pinned-tab-icon.svg')
-  potrace.trace(options.i, (err, svg) => {
-    if (err) throw err
-    fs.writeFileSync(outPath, svg)
+const checkPngcrush = () =>
+  new Promise((resolve, reject) => {
+    exec('pngcrush --version', (error, stdout, stderr) => resolve(!error))
   })
-}
+
+const generateFavicon = options =>
+  new Promise((resolve, reject) => {
+    const outPath = path.join(options.o, 'favicon.ico')
+    pngToIco(options.i)
+      .then(buf => {
+        fs.writeFileSync(outPath, buf)
+        resolve(buf)
+      })
+      .catch(reject)
+  })
+
+const generateSvg = options =>
+  new Promise((resolve, reject) => {
+    const outPath = path.join(options.o, '/icons/safari-pinned-tab-icon.svg')
+    potrace.trace(options.i, (err, svg) => {
+      if (err) {
+        reject(err)
+      } else {
+        fs.writeFileSync(outPath, svg)
+        resolve(svg)
+      }
+    })
+  })
 
 const generateIcons = async options => {
+  const pngcrushInstalled = await checkPngcrush()
+  if (!pngcrushInstalled) {
+    console.log('warn: pngcrush is not installed. Icons will not be optimized.')
+  }
   const image = await Jimp.read(options.i)
   if (image.bitmap.width < 512 || image.bitmap.height < 512) {
     throw new Error('Image must be at least 512x512 pixels')
@@ -290,20 +305,56 @@ const generateIcons = async options => {
   if (image.bitmap.width !== image.bitmap.height) {
     throw new Error('Image is not square')
   }
-  generateFavicon(options)
-  generateSvg(options)
-  iconsConfig.forEach(icon => {
-    const clonedImage = image.clone()
-    const size = icon.size
-    const outPath = path.join(options.o, icon.file)
-    clonedImage.resize(size, size)
-    if (icon.backgroundColor && options.iconBackgroundColor) {
-      new Jimp(size, size, options.iconBackgroundColor, (_err, bgImage) => {
-        bgImage.composite(clonedImage, 0, 0).write(outPath)
+
+  let promises = [generateFavicon(options), generateSvg(options)]
+  promises = promises.concat(
+    iconsConfig.map(icon => {
+      return new Promise((resolve, reject) => {
+        const clonedImage = image.clone()
+        const size = icon.size
+        const outPath = path.join(options.o, icon.file)
+        clonedImage.resize(size, size)
+        if (icon.backgroundColor && options.iconBackgroundColor) {
+          new Jimp(size, size, options.iconBackgroundColor, (err, bgImage) => {
+            if (err) {
+              reject(err)
+            } else {
+              writeFile(bgImage.composite(clonedImage, 0, 0), outPath, pngcrushInstalled)
+                .then(resolve)
+                .catch(reject)
+            }
+          })
+        } else {
+          writeFile(clonedImage, outPath, pngcrushInstalled)
+            .then(resolve)
+            .catch(reject)
+        }
       })
-    } else {
-      clonedImage.write(outPath)
-    }
+    })
+  )
+  return Promise.all(promises)
+}
+
+const writeFile = async (image, outPath, optimize) => {
+  return new Promise((resolve, reject) => {
+    image.write(outPath, (err, image) => {
+      if (err) {
+        reject(err)
+      } else {
+        if (optimize) {
+          const command = `pngcrush -res 72 -reduce -brute -ow ${outPath} pngout-$$.png`
+          exec(command, err => {
+            if (err) {
+              reject(err)
+            } else {
+              resolve(image)
+            }
+          })
+        } else {
+          resolve(image)
+        }
+      }
+    })
   })
 }
 
@@ -389,27 +440,28 @@ const generateHeaderTags = (options, iconsConfig) => {
 // START HERE
 
 const main = async () => {
+  if (!argv.q) console.log('🖼 Generating icons ...')
   try {
     await generateIcons(argv)
   } catch (err) {
     console.log(err)
     process.exit(1)
   }
-  if (!argv.q) console.log('🖼 Icons generated')
 
+  if (!argv.q) console.log('📋 Generating manifest.json ...')
   generateManifest(
     argv,
     iconsConfig.filter(icon => icon.manifest)
   )
-  if (!argv.q) console.log('📋 manifest.json generated')
 
+  if (!argv.q) console.log('📋 Generating browserconfig.xml ...')
   generateBrowserconfig(
     argv,
     iconsConfig.filter(icon => icon.browserconfig)
   )
-  if (!argv.q) console.log('📋 browserconfig.xml generated')
 
   if (!argv.q) {
+    console.log('🎉 All done!')
     console.log('\nNow copy this tags inside the <head> tag of your application:')
     console.log('<!-- -------------------- Manifestify head tags begin -------------------- -->')
     console.log(
