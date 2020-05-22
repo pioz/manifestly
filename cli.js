@@ -399,7 +399,7 @@ const generateHeaderTags = (options, iconsConfig) => {
     '<meta name="msapplication-config" content="/browserconfig.xml" />',
     '<meta name="msapplication-tap-highlight" content="no" />'
   ]
-  header = header.concat(['<link rel="mask-icon" href="/icons/safari-pinned-tab-icon.svg">'])
+  header = header.concat(['<link rel="mask-icon" href="/icons/safari-pinned-tab-icon.svg" />'])
   header = header.concat(
     iconsConfig
       .filter(icon => icon.head)
