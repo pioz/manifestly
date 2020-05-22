@@ -384,13 +384,6 @@ const writeErrorCallback = err => {
   if (err) throw err
 }
 
-const generateIconHeadTag = icon => {
-  if (icon.head === 'tile-image') {
-    return `<meta name="msapplication-TileImage" content="${icon.file}" />`
-  }
-  return `<link rel="${icon.head}" href="${icon.file}" type="${icon.type}" sizes="${icon.size}x${icon.size}" />`
-}
-
 const generateHeaderTags = (options, iconsConfig) => {
   let header = [
     '<meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, user-scalable=no, viewport-fit=cover" />',
@@ -402,12 +395,18 @@ const generateHeaderTags = (options, iconsConfig) => {
     `<meta name="apple-mobile-web-app-title" content="${options.n}" />`,
     '<meta name="format-detection" content="telephone=no" />',
     `<meta name="msapplication-TileColor" content="${options.themeColor}" />`,
-    `<meta name="msapplication-TileImage" content="/icons/ms-icon-150x150.png" />`,
+    '<meta name="msapplication-TileImage" content="/icons/ms-icon-150x150.png" />',
     '<meta name="msapplication-config" content="/browserconfig.xml" />',
     '<meta name="msapplication-tap-highlight" content="no" />'
   ]
   header = header.concat(['<link rel="mask-icon" href="/icons/safari-pinned-tab-icon.svg">'])
-  header = header.concat(iconsConfig.filter(icon => icon.head).map(icon => `<link rel="${icon.head}" href="${icon.file}" type="${icon.type}" sizes="${icon.size}x${icon.size}" />`))
+  header = header.concat(
+    iconsConfig
+      .filter(icon => icon.head)
+      .map(
+        icon => `<link rel="${icon.head}" href="${icon.file}" type="${icon.type}" sizes="${icon.size}x${icon.size}" />`
+      )
+  )
   header = header.concat(['<link rel="manifest" href="/manifest.json" />'])
   return header.join('\n')
 }
