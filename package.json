@@ -1,7 +1,7 @@
 {
   "name": "manifestify",
   "version": "0.1.0",
-  "description": "Generate manifest.json file with all icons",
+  "description": "Generates manifest.json file with all the necessary icons resized",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

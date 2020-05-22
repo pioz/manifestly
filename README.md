@@ -1,5 +1,7 @@
 # Manifestify
 
+Generates `manifest.json` file with all the necessary icons resized.
+
 Simple cli tool to generate icons for your webapp for every device with PWA support.
 Manifestify do boring things for you:
 
