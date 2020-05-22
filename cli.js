@@ -176,70 +176,48 @@ const iconsConfig = [
     file: '/icons/pwa-icon-36x36.png',
     size: 36,
     type: 'image/png',
-    backgroundColor: true,
     manifest: true
   },
   {
     file: '/icons/pwa-icon-48x48.png',
     size: 48,
     type: 'image/png',
-    backgroundColor: true,
     manifest: true
   },
   {
     file: '/icons/pwa-icon-72x72.png',
     size: 72,
     type: 'image/png',
-    backgroundColor: true,
     manifest: true
   },
   {
     file: '/icons/pwa-icon-96x96.png',
     size: 96,
     type: 'image/png',
-    backgroundColor: true,
-    manifest: true
-  },
-  {
-    file: '/icons/pwa-icon-128x128.png',
-    size: 128,
-    type: 'image/png',
-    backgroundColor: true,
     manifest: true
   },
   {
     file: '/icons/pwa-icon-144x144.png',
     size: 144,
     type: 'image/png',
-    backgroundColor: true,
-    manifest: true
-  },
-  {
-    file: '/icons/pwa-icon-152x152.png',
-    size: 152,
-    type: 'image/png',
-    backgroundColor: true,
     manifest: true
   },
   {
     file: '/icons/pwa-icon-192x192.png',
     size: 192,
     type: 'image/png',
-    backgroundColor: true,
     manifest: true
   },
   {
     file: '/icons/pwa-icon-384x384.png',
     size: 384,
     type: 'image/png',
-    backgroundColor: true,
     manifest: true
   },
   {
     file: '/icons/pwa-icon-512x512.png',
     size: 512,
     type: 'image/png',
-    backgroundColor: true,
     manifest: true
   },
   // Microsoft
@@ -280,12 +258,6 @@ const iconsConfig = [
   {
     file: '/icons/favicon-48x48.png',
     size: 48,
-    type: 'image/png',
-    head: 'icon'
-  },
-  {
-    file: '/icons/favicon-256x256.png',
-    size: 256,
     type: 'image/png',
     head: 'icon'
   }
@@ -399,7 +371,10 @@ const generateHeaderTags = (options, iconsConfig) => {
     '<meta name="msapplication-config" content="/browserconfig.xml" />',
     '<meta name="msapplication-tap-highlight" content="no" />'
   ]
-  header = header.concat(['<link rel="mask-icon" href="/icons/safari-pinned-tab-icon.svg" />'])
+  const iconBackgroundColor = options.iconBackgroundColor || '#ffffff'
+  header = header.concat([
+    `<link rel="mask-icon" href="/icons/safari-pinned-tab-icon.svg" color="${iconBackgroundColor}" />`
+  ])
   header = header.concat(
     iconsConfig
       .filter(icon => icon.head)
