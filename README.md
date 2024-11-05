@@ -31,7 +31,7 @@ Some mobile browsers allow users to bookmark the web page to their home screen. 
 
 ### PWA
 
-Manifestify generate a standard [manifest.json](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/manifest.json) file for Progressive Web Apps.
+Manifestify generate a standard [manifest.json](https://developer.mozilla.org/en-US/docs/Web/Manifest) file for Progressive Web Apps.
 
 ## Install and Usage
 
