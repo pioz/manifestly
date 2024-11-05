@@ -1,6 +1,6 @@
 {
   "name": "manifestify",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Generates manifest.json file with all the necessary icons resized",
   "main": "cli.js",
   "scripts": {
