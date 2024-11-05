@@ -36,8 +36,9 @@ Manifestify generate a standard [manifest.json](https://developer.mozilla.org/en
 ## Install and Usage
 
 ```
-npm install manifestify
-manifestify --help
+git clone https://github.com/pioz/manifestify.git
+cd manifestify
+node . --help
 ```
 
 ## Questions or problems?
