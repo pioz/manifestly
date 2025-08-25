@@ -8,7 +8,7 @@ const potrace = require('potrace')
 const { exec } = require('child_process')
 
 const argv = require('yargs')
-  .usage('Usage: $0 -o FOLDER -i ICON_PATH -n APP_NAME')
+  .usage('Usage: $0 -o FOLDER -i SQUARED_PNG_ICON_PATH -n APP_NAME')
   .nargs('o', 1)
   .default('o', '.')
   .alias('o', 'output')
@@ -18,7 +18,7 @@ const argv = require('yargs')
   .alias('i', 'icon')
   .describe(
     'i',
-    'Icon used to generate all icons: must be a square icon with minimal size of 512x512 pixels. From this icon will be generated all other resized icons.'
+    'Icon used to generate all icons: must be a square PNG icon with minimal size of 512x512 pixels. From this icon will be generated all other resized icons.'
   )
   .nargs('icon-background-color', 1)
   .describe('icon-background-color', 'Background color to apply on icons with transparent background.')
@@ -269,18 +269,18 @@ const checkPngcrush = () =>
     exec('pngcrush --version', (error, stdout, stderr) => resolve(!error))
   })
 
-const generateFavicon = options =>
+const generateFavicon = (options) =>
   new Promise((resolve, reject) => {
     const outPath = path.join(options.o, 'favicon.ico')
     pngToIco(options.i)
-      .then(buf => {
+      .then((buf) => {
         fs.writeFileSync(outPath, buf)
         resolve(buf)
       })
       .catch(reject)
   })
 
-const generateSvg = options =>
+const generateSvg = (options) =>
   new Promise((resolve, reject) => {
     const outPath = path.join(options.o, '/icons/safari-pinned-tab-icon.svg')
     potrace.trace(options.i, (err, svg) => {
@@ -293,7 +293,7 @@ const generateSvg = options =>
     })
   })
 
-const generateIcons = async options => {
+const generateIcons = async (options) => {
   const pngcrushInstalled = await checkPngcrush()
   if (!pngcrushInstalled) {
     console.log('warn: pngcrush is not installed. Icons will not be optimized.')
@@ -308,7 +308,7 @@ const generateIcons = async options => {
 
   let promises = [generateFavicon(options), generateSvg(options)]
   promises = promises.concat(
-    iconsConfig.map(icon => {
+    iconsConfig.map((icon) => {
       return new Promise((resolve, reject) => {
         const clonedImage = image.clone()
         const size = icon.size
@@ -319,15 +319,11 @@ const generateIcons = async options => {
             if (err) {
               reject(err)
             } else {
-              writeFile(bgImage.composite(clonedImage, 0, 0), outPath, pngcrushInstalled)
-                .then(resolve)
-                .catch(reject)
+              writeFile(bgImage.composite(clonedImage, 0, 0), outPath, pngcrushInstalled).then(resolve).catch(reject)
             }
           })
         } else {
-          writeFile(clonedImage, outPath, pngcrushInstalled)
-            .then(resolve)
-            .catch(reject)
+          writeFile(clonedImage, outPath, pngcrushInstalled).then(resolve).catch(reject)
         }
       })
     })
@@ -343,7 +339,7 @@ const writeFile = async (image, outPath, optimize) => {
       } else {
         if (optimize) {
           const command = `pngcrush -res 72 -reduce -brute -ow ${outPath} pngout-$$.png`
-          exec(command, err => {
+          exec(command, (err) => {
             if (err) {
               reject(err)
             } else {
@@ -373,7 +369,7 @@ const generateManifest = (options, iconsConfig) => {
   if (options.startUrl) manifest.start_url = options.startUrl
   if (options.themeColor) manifest.theme_color = options.themeColor
 
-  manifest.icons = iconsConfig.map(icon => {
+  manifest.icons = iconsConfig.map((icon) => {
     return {
       src: icon.file,
       sizes: `${icon.size}x${icon.size}`,
@@ -387,7 +383,7 @@ const generateManifest = (options, iconsConfig) => {
 }
 
 const generateBrowserconfig = (options, icons) => {
-  const iconsTags = icons.map(icon => `<square${icon.size}x${icon.size}logo src="${icon.file}"/>`)
+  const iconsTags = icons.map((icon) => `<square${icon.size}x${icon.size}logo src="${icon.file}"/>`)
 
   // https://msdn.microsoft.com/en-us/library/ie/dn455106.aspx
   const xml = `<?xml version="1.0" encoding="utf-8"?>
@@ -403,7 +399,7 @@ const generateBrowserconfig = (options, icons) => {
   fs.writeFile(xmlPath, xml, writeErrorCallback)
 }
 
-const writeErrorCallback = err => {
+const writeErrorCallback = (err) => {
   if (err) throw err
 }
 
@@ -428,9 +424,10 @@ const generateHeaderTags = (options, iconsConfig) => {
   ])
   header = header.concat(
     iconsConfig
-      .filter(icon => icon.head)
+      .filter((icon) => icon.head)
       .map(
-        icon => `<link rel="${icon.head}" href="${icon.file}" type="${icon.type}" sizes="${icon.size}x${icon.size}" />`
+        (icon) =>
+          `<link rel="${icon.head}" href="${icon.file}" type="${icon.type}" sizes="${icon.size}x${icon.size}" />`
       )
   )
   header = header.concat(['<link rel="manifest" href="/manifest.json" />'])
@@ -451,26 +448,26 @@ const main = async () => {
   if (!argv.q) console.log('📋 Generating manifest.json ...')
   generateManifest(
     argv,
-    iconsConfig.filter(icon => icon.manifest)
+    iconsConfig.filter((icon) => icon.manifest)
   )
 
   if (!argv.q) console.log('📋 Generating browserconfig.xml ...')
   generateBrowserconfig(
     argv,
-    iconsConfig.filter(icon => icon.browserconfig)
+    iconsConfig.filter((icon) => icon.browserconfig)
   )
 
   if (!argv.q) {
     console.log('🎉 All done!')
     console.log('\nNow copy this tags inside the <head> tag of your application:')
-    console.log('<!-- -------------------- Manifestify head tags begin -------------------- -->')
+    console.log('<!-- -------------------- Manifestly head tags begin -------------------- -->')
     console.log(
       generateHeaderTags(
         argv,
-        iconsConfig.filter(icon => icon.head)
+        iconsConfig.filter((icon) => icon.head)
       )
     )
-    console.log('<!-- --------------------- Manifestify head tags end --------------------- -->')
+    console.log('<!-- --------------------- Manifestly head tags end --------------------- -->')
   }
 }
 

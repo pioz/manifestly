@@ -1,9 +1,9 @@
-# Manifestify
+# Manifestly
 
 Generates `manifest.json` file with all the necessary icons resized.
 
 Simple cli tool to generate icons for your webapp for every device with PWA support.
-Manifestify do boring things for you:
+Manifestly do boring things for you:
 
 - 🖼 Cut and resize webapp icons
 - ⚙️ Optimize icons with [Pngcrush](https://pmt.sourceforge.io/pngcrush/)
@@ -22,7 +22,7 @@ Manifestify do boring things for you:
 
 ### Touch icons
 
-Some mobile browsers allow users to bookmark the web page to their home screen. Manifestify support:
+Some mobile browsers allow users to bookmark the web page to their home screen. Manifestly support:
 
 - Apple / Safari
 - Opera Coast
@@ -31,23 +31,23 @@ Some mobile browsers allow users to bookmark the web page to their home screen. 
 
 ### PWA
 
-Manifestify generate a standard [manifest.json](https://developer.mozilla.org/en-US/docs/Web/Manifest) file for Progressive Web Apps.
+Manifestly generate a standard [manifest.json](https://developer.mozilla.org/en-US/docs/Web/Manifest) file for Progressive Web Apps.
 
 ## Install and Usage
 
 ```
-git clone https://github.com/pioz/manifestify.git
-cd manifestify
+git clone https://github.com/pioz/manifestly.git
+cd manifestly
 node . --help
 ```
 
 ## Questions or problems?
 
 If you have any issues please add an [issue on
-GitHub](https://github.com/pioz/manifestify/issues) or fork the project and send a
+GitHub](https://github.com/pioz/manifestly/issues) or fork the project and send a
 pull request.
 
 ## Copyright
 
 Copyright (c) 2020 [Enrico Pilotto (@pioz)](https://github.com/pioz). See
-[LICENSE](https://github.com/pioz/manifestify/blob/master/LICENSE) for details.
+[LICENSE](https://github.com/pioz/manifestly/blob/master/LICENSE) for details.

@@ -1,6 +1,6 @@
 {
-  "name": "manifestify",
-  "version": "0.1.2",
+  "name": "manifestly",
+  "version": "0.1.3",
   "description": "Generates manifest.json file with all the necessary icons resized",
   "main": "cli.js",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/pioz/manifestify.git"
+    "url": "git://github.com/pioz/manifestly.git"
   },
   "keywords": [
     "manifest",
@@ -20,11 +20,11 @@
   "author": "pioz",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/pioz/manifestify/issues"
+    "url": "https://github.com/pioz/manifestly/issues"
   },
-  "homepage": "https://github.com/pioz/manifestify#readme",
+  "homepage": "https://github.com/pioz/manifestly#readme",
   "bin": {
-    "manifestify": "./cli.js"
+    "manifestly": "./cli.js"
   },
   "dependencies": {
     "jimp": "^0.16.1",
