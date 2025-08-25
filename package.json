@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/pioz/manifestly#readme",
   "bin": {
-    "manifestly": "./cli.js"
+    "manifestly": "cli.js"
   },
   "dependencies": {
     "jimp": "^1.6.0",
