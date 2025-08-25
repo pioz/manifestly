@@ -319,7 +319,9 @@ const generateIcons = async (options) => {
             if (err) {
               reject(err)
             } else {
-              writeFile(bgImage.composite(clonedImage, 0, 0), outPath, pngcrushInstalled).then(resolve).catch(reject)
+              writeFile(bgImage.composite(clonedImage, 0, 0), outPath, pngcrushInstalled)
+                .then(resolve)
+                .catch(reject)
             }
           })
         } else {
