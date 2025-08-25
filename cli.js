@@ -2,13 +2,22 @@
 
 const fs = require('fs')
 const path = require('path')
-const Jimp = require('jimp')
-const pngToIco = require('png-to-ico')
+const { Jimp } = require('jimp')
+const yargs = require('yargs')
+const { hideBin } = require('yargs/helpers')
+const pngToIco = require('png-to-ico').default
 const potrace = require('potrace')
 const { exec } = require('child_process')
 
-const argv = require('yargs')
+const argv = yargs(hideBin(process.argv))
   .usage('Usage: $0 -o FOLDER -i SQUARED_PNG_ICON_PATH -n APP_NAME')
+  .config('config', () => {
+    const configPath = path.resolve('.manifestly.json')
+    if (fs.existsSync(configPath)) {
+      return JSON.parse(fs.readFileSync(configPath, 'utf-8'))
+    }
+    return {}
+  })
   .nargs('o', 1)
   .default('o', '.')
   .alias('o', 'output')
@@ -104,7 +113,9 @@ const argv = require('yargs')
   .alias('q', 'quiet')
   .describe('q', 'Do not print info on standard output.')
   .default('q', false)
-  .example('$0 -o FOLDER -i ICON_PATH -n APP_NAME').argv
+  .example('$0 -o FOLDER -i ICON_PATH -n APP_NAME')
+  .help()
+  .parse()
 
 const iconsConfig = [
   // Apple
@@ -265,8 +276,8 @@ const iconsConfig = [
 ]
 
 const checkPngcrush = () =>
-  new Promise((resolve, reject) => {
-    exec('pngcrush --version', (error, stdout, stderr) => resolve(!error))
+  new Promise((resolve) => {
+    exec('pngcrush --version', (error) => resolve(!error))
   })
 
 const generateFavicon = (options) =>
@@ -283,10 +294,10 @@ const generateFavicon = (options) =>
 const generateSvg = (options) =>
   new Promise((resolve, reject) => {
     const outPath = path.join(options.o, '/icons/safari-pinned-tab-icon.svg')
+    fs.mkdirSync(path.dirname(outPath), { recursive: true })
     potrace.trace(options.i, (err, svg) => {
-      if (err) {
-        reject(err)
-      } else {
+      if (err) reject(err)
+      else {
         fs.writeFileSync(outPath, svg)
         resolve(svg)
       }
@@ -298,6 +309,7 @@ const generateIcons = async (options) => {
   if (!pngcrushInstalled) {
     console.log('warn: pngcrush is not installed. Icons will not be optimized.')
   }
+
   const image = await Jimp.read(options.i)
   if (image.bitmap.width < 512 || image.bitmap.height < 512) {
     throw new Error('Image must be at least 512x512 pixels')
@@ -313,17 +325,14 @@ const generateIcons = async (options) => {
         const clonedImage = image.clone()
         const size = icon.size
         const outPath = path.join(options.o, icon.file)
-        clonedImage.resize(size, size)
+        clonedImage.resize({ w: size, h: size }) // nuova API
         if (icon.backgroundColor && options.iconBackgroundColor) {
-          new Jimp(size, size, options.iconBackgroundColor, (err, bgImage) => {
-            if (err) {
-              reject(err)
-            } else {
-              writeFile(bgImage.composite(clonedImage, 0, 0), outPath, pngcrushInstalled)
-                .then(resolve)
-                .catch(reject)
-            }
-          })
+          new Jimp({ w: size, h: size, background: options.iconBackgroundColor })
+            .then((bgImage) => {
+              return writeFile(bgImage.composite(clonedImage, 0, 0), outPath, pngcrushInstalled)
+            })
+            .then(resolve)
+            .catch(reject)
         } else {
           writeFile(clonedImage, outPath, pngcrushInstalled).then(resolve).catch(reject)
         }
@@ -334,26 +343,24 @@ const generateIcons = async (options) => {
 }
 
 const writeFile = async (image, outPath, optimize) => {
-  return new Promise((resolve, reject) => {
-    image.write(outPath, (err, image) => {
-      if (err) {
-        reject(err)
-      } else {
-        if (optimize) {
-          const command = `pngcrush -res 72 -reduce -brute -ow ${outPath} pngout-$$.png`
-          exec(command, (err) => {
-            if (err) {
-              reject(err)
-            } else {
-              resolve(image)
-            }
-          })
-        } else {
-          resolve(image)
-        }
-      }
+  fs.mkdirSync(path.dirname(outPath), { recursive: true })
+  await image.write(outPath)
+
+  if (optimize) {
+    const command = `pngcrush -res 72 -reduce -brute -ow ${outPath} pngout-$$.png`
+    return new Promise((resolve, reject) => {
+      exec(command, (err) => {
+        if (err) reject(err)
+        else resolve(image)
+      })
     })
-  })
+  }
+
+  return image
+}
+
+const writeErrorCallback = (err) => {
+  if (err) throw err
 }
 
 const generateManifest = (options, iconsConfig) => {
@@ -371,13 +378,11 @@ const generateManifest = (options, iconsConfig) => {
   if (options.startUrl) manifest.start_url = options.startUrl
   if (options.themeColor) manifest.theme_color = options.themeColor
 
-  manifest.icons = iconsConfig.map((icon) => {
-    return {
-      src: icon.file,
-      sizes: `${icon.size}x${icon.size}`,
-      type: icon.type
-    }
-  })
+  manifest.icons = iconsConfig.map((icon) => ({
+    src: icon.file,
+    sizes: `${icon.size}x${icon.size}`,
+    type: icon.type
+  }))
 
   const json = JSON.stringify(manifest, null, 2)
   const jsonPath = path.join(options.o, 'manifest.json')
@@ -399,10 +404,6 @@ const generateBrowserconfig = (options, icons) => {
 </browserconfig>`
   const xmlPath = path.join(options.o, 'browserconfig.xml')
   fs.writeFile(xmlPath, xml, writeErrorCallback)
-}
-
-const writeErrorCallback = (err) => {
-  if (err) throw err
 }
 
 const generateHeaderTags = (options, iconsConfig) => {
@@ -443,7 +444,7 @@ const main = async () => {
   try {
     await generateIcons(argv)
   } catch (err) {
-    console.log(err)
+    console.error(err)
     process.exit(1)
   }
 
