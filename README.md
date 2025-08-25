@@ -11,6 +11,12 @@ Manifestly do boring things for you:
 - 📋 Generete `browserconfig.xml` file
 - ✂️ Print tags to paste in the head tag of your web app
 
+### Install
+
+```
+npm install -g manifestly
+```
+
 ### Favicon support
 
 - ✅ IE <= 10 with `/favicon.ico` file
