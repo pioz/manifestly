@@ -322,20 +322,15 @@ const generateIcons = async (options) => {
   promises = promises.concat(
     iconsConfig.map((icon) => {
       return new Promise((resolve, reject) => {
-        const clonedImage = image.clone()
+        let clonedImage = image.clone()
         const size = icon.size
         const outPath = path.join(options.o, icon.file)
         clonedImage.resize({ w: size, h: size }) // nuova API
         if (icon.backgroundColor && options.iconBackgroundColor) {
-          new Jimp({ w: size, h: size, background: options.iconBackgroundColor })
-            .then((bgImage) => {
-              return writeFile(bgImage.composite(clonedImage, 0, 0), outPath, pngcrushInstalled)
-            })
-            .then(resolve)
-            .catch(reject)
-        } else {
-          writeFile(clonedImage, outPath, pngcrushInstalled).then(resolve).catch(reject)
+          const bgImage = new Jimp({ width: size, height: size, color: options.iconBackgroundColor })
+          clonedImage = bgImage.composite(clonedImage, 0, 0)
         }
+        writeFile(clonedImage, outPath, pngcrushInstalled).then(resolve).catch(reject)
       })
     })
   )
